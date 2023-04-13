@@ -1,8 +1,12 @@
 import json
 import boto3
 import requests
+import time 
 
 def lambda_handler(event, context):
+    #time for saving 
+    stamp = time.ctime().replace(' ','_')
+
     # Make API request using requests library
     response = requests.get('https://www.dallasopendata.com/resource/d7e7-envw.json?$limit=25')
 
@@ -18,8 +22,8 @@ def lambda_handler(event, context):
 
     # Save the data to S3 bucket
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket('apidatabucket45')
-    object_key = 'data.json'
+    bucket = s3.Bucket('apidata-bucket-rawjson')
+    object_key = f'data_{stamp}.json'
     bucket.put_object(
         Key=object_key,
         Body=json.dumps(data)
