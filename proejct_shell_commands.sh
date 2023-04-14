@@ -12,8 +12,10 @@ aws s3 cp api-func-deployment-package.zip s3://apidata-bucket-general-files
 # create lambda execution role with trust policy 
 aws iam create-role --role-name lambda-ex --assume-role-policy-document \
 '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null;
-#attach execution policy 
-aws iam attach-role-policy --role-name lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#attach execution policy and s3write 
+aws iam attach-role-policy --role-name lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole;
+aws iam attach-role-policy --role-name lambda-ex --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
 
 #get ARN of execution role ; needed for function creation 
 LAMBDA_EX_ROLE_ARN=$(aws iam get-role --role-name lambda-ex --query 'Role.[Arn]' --output text)
@@ -24,7 +26,7 @@ aws lambda create-function --function-name apidata-lambda-getdata \
 --code S3Bucket=apidata-bucket-general-files,S3Key=api-func-deployment-package.zip
 
 
-
-
+#invoke function
+aws lambda invoke --function-name apidata-lambda-getdata -
 
 
