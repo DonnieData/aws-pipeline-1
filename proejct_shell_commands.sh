@@ -36,9 +36,9 @@ aws lambda invoke --function-name apidata-lambda-getdata -
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 
 #create eventbridge rule; add a target to the rule; grant permission to lambda function 
-aws events put-rule --name apidata-event-5minutetrigger --schedule-expression "rate(5 minutes)";
-aws events put-targets --rule my-schedule-rule \
---targets "Id"="apidata-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:apidata-lambda-getdata"
 
 
 
+aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(5 minutes)" --state ENABLED;
+aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
+--targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata"
