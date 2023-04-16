@@ -42,13 +42,27 @@ LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-la
 
 wait 
 
---------
+
+EVENT_POLICY_JSON="{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "events:PutEvents",
+                "lambda:ListFunctions",
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "*"
+        }
+    ]
+}"
+
+------------
 
 #create policy 
-aws iam create-policy --policy-name ${PROJECT_NAME}-policy-getdata --policy-document \
-{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Action": "events:PutEvents","Resource": "*"},\
-{"Effect": "Allow","Action": "lambda:InvokeFunction","Resource": ${LAMBDA_GETDATA_ARN}},{"Effect": "Allow","Action": "lambda:ListFunctions","Resource": "*"}]}
-
+aws iam create-policy --policy-name ${PROJECT_NAME}-policy-getdata --policy-document "$EVENT_POLICY_JSON"
 #create json. with policy info then can load from s3 
 
 
