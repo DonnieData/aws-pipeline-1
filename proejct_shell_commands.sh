@@ -45,8 +45,8 @@ aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
 
 
 aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(5 minutes)" --state ENABLED \
---role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex ;
+--role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex;
 
 aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
---targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata"
+--targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
 

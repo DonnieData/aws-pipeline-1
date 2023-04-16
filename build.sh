@@ -42,22 +42,25 @@ wait
 LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-lambda-getdata" --query 'Configuration.FunctionArn' --output text);
 
 
-#create policy 
+#create policies and add to role  
 #upload to cloudshell home directory; use file from home directory as parameter
 curl -o lambda-eventbridge-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-policy.json;
 
 aws iam create-policy \
 --policy-name ${PROJECT_NAME}-policy-getdata \
---policy-document file://~/lambda-eventbridge-policy.json
+--policy-document file://~/lambda-eventbridge-policy.json;
 
-wait 
-#attach to role 
-aws iam attach-role-policy --role-name ${PROJECT_NAME}-lambda-ex --policy-arn arn:aws:iam::${ACCNT_ID}:policy/${PROJECT_NAME}-policy-getdata
+curl -o lambda-eventbridge-trust-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-trust-policy.json;
 
-
-
-
+aws iam update-assume-role-policy \
+--role-name ${PROJECT_NAME}-lambda-ex \
+--policy-document file://~/lambda-eventbridge-trust-policy.json;
 
 
+#eventbridge 
 
-#need to make lambda function dynamic to get proper bucket 
+aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(5 minutes)" --state ENABLED \
+--role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex;
+
+aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
+--targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
