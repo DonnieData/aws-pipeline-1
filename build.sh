@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata4
+PROJECT_NAME=apidata5
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -50,18 +50,17 @@ LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-la
 #create policies and add to role  
 #upload to cloudshell home directory; use file from home directory as parameter
 curl -o lambda-eventbridge-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-policy.json;
-
 aws iam create-policy \
 --policy-name ${PROJECT_NAME}-policy-getdata \
 --policy-document file://~/lambda-eventbridge-policy.json;
 
+#update trust policy 
 curl -o lambda-eventbridge-trust-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-trust-policy.json;
-
 aws iam update-assume-role-policy \
 --role-name ${PROJECT_NAME}-lambda-ex \
 --policy-document file://~/lambda-eventbridge-trust-policy.json;
 
-
+wait 
 #eventbridge 
 
 aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(5 minutes)" --state ENABLED \
