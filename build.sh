@@ -38,38 +38,25 @@ aws lambda create-function --function-name ${PROJECT_NAME}-lambda-getdata \
 --code S3Bucket=${PROJECT_NAME}-bucket-general-files,S3Key=api-func-deployment-package.zip > /dev/null;
 }
 
-LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-lambda-getdata" --query 'Configuration.FunctionArn' --output text)
-
 wait 
+LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-lambda-getdata" --query 'Configuration.FunctionArn' --output text);
 
-
-EVENT_POLICY_JSON="{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "events:PutEvents",
-                "lambda:ListFunctions",
-                "lambda:InvokeFunction"
-            ],
-            "Resource": "*"
-        }
-    ]
-}"
-
-------------
 
 #create policy 
-aws iam create-policy --policy-name ${PROJECT_NAME}-policy-getdata --policy-document "$EVENT_POLICY_JSON"
-#create json. with policy info then can load from s3 
+#upload to cloudshell home directory; use file from home directory as parameter
+curl -o lambda-eventbridge-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-policy.json;
+
+aws iam create-policy \
+--policy-name ${PROJECT_NAME}-policy-getdata \
+--policy-document file://~/lambda-eventbridge-policy.json
+
+wait 
+#attach to role 
+aws iam attach-role-policy --role-name ${PROJECT_NAME}-lambda-ex --policy-arn arn:aws:iam::${ACCNT_ID}:policy/${PROJECT_NAME}-policy-getdata
 
 
-{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Action": "events:PutEvents","Resource": "*"},
-{"Effect": "Allow","Action": "lambda:InvokeFunction","Resource": ${LAMBDA_GETDATA_ARN}},{"Effect": "Allow","Action": "lambda:ListFunctions","Resource": "*"}]}
 
-#attach policy to lambda ex 
+
 
 
 
