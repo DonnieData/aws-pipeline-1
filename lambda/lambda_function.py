@@ -1,9 +1,12 @@
+import os
 import json
 import boto3
 import requests
 import time 
 
 def lambda_handler(event, context):
+    #get correct bucket name 
+    raw_data_bucket_name = os.environ.get("raw_data_bucket")
     #time for saving 
     stamp = time.ctime().replace(' ','_')
 
@@ -22,7 +25,7 @@ def lambda_handler(event, context):
 
     # Save the data to S3 bucket
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket('apidata-bucket-rawjson')
+    bucket = s3.Bucket(raw_data_bucket_name)
     object_key = f'data_{stamp}.json'
     bucket.put_object(
         Key=object_key,
