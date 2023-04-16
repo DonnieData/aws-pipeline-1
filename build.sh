@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata3
+PROJECT_NAME=apidata4
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -11,6 +11,10 @@ aws s3 mb s3://${PROJECT_NAME}-bucket-general-files;
 aws s3 mb s3://${PROJECT_NAME}-transform;
 }
 wait 
+
+# parameter/variable file
+echo '{"project_name":'${PROJECT_NAME}', "account_id": '${ACCNT_ID}'}' > samp.json
+aws s3 cp samp.json s3://${PROJECT_NAME}-bucket-general-files/samp.json
 
 #get build files for lambda get data funciton 
 {
@@ -35,7 +39,8 @@ sleep 10
 {
 aws lambda create-function --function-name ${PROJECT_NAME}-lambda-getdata \
 --role ${LAMBDA_EX_ROLE_ARN} --runtime python3.9 --handler lambda_function.lambda_handler \
---code S3Bucket=${PROJECT_NAME}-bucket-general-files,S3Key=api-func-deployment-package.zip > /dev/null;
+--code S3Bucket=${PROJECT_NAME}-bucket-general-files,S3Key=api-func-deployment-package.zip \
+--environment Variables={raw_data_bucket=${PROJECT_NAME}-bucket-rawjson} > /dev/null;
 }
 
 wait 
