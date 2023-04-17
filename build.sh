@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata5
+PROJECT_NAME=apidata2
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -36,12 +36,12 @@ LAMBDA_EX_ROLE_ARN=$(aws iam get-role --role-name ${PROJECT_NAME}-lambda-ex --qu
 sleep 10 
 
 #create lambda function 
-{
+
 aws lambda create-function --function-name ${PROJECT_NAME}-lambda-getdata \
 --role ${LAMBDA_EX_ROLE_ARN} --runtime python3.9 --handler lambda_function.lambda_handler \
 --code S3Bucket=${PROJECT_NAME}-bucket-general-files,S3Key=api-func-deployment-package.zip \
 --environment Variables={raw_data_bucket=${PROJECT_NAME}-bucket-rawjson} > /dev/null;
-}
+
 
 wait 
 LAMBDA_GETDATA_ARN=$(aws lambda get-function --function-name "${PROJECT_NAME}-lambda-getdata" --query 'Configuration.FunctionArn' --output text);
@@ -53,6 +53,7 @@ curl -o lambda-eventbridge-policy.json https://raw.githubusercontent.com/DonnieD
 aws iam create-policy \
 --policy-name ${PROJECT_NAME}-policy-getdata \
 --policy-document file://~/lambda-eventbridge-policy.json;
+wait 
 
 #update trust policy 
 curl -o lambda-eventbridge-trust-policy.json https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/lambda-eventbridge-trust-policy.json;
@@ -63,8 +64,18 @@ aws iam update-assume-role-policy \
 wait 
 #eventbridge 
 
-aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(5 minutes)" --state ENABLED \
---role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex;
-
+aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(3 minutes)" --state ENABLED 
+#--role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex
+wait 
 aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
 --targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
+
+#---------------
+#add event permissions to lambda function
+RULE_ARN=$(aws events list-rules --name ${PROJECT_NAME}-event-5minutetrigger --query 'Rules[0].Arn' --output text)
+
+
+aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
+ --statement-id lambda1 --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn ${RULE_ARN}
+
+
