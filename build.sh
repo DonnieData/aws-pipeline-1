@@ -9,6 +9,7 @@ wait
 aws s3 mb s3://${PROJECT_NAME}-bucket-rawjson; 
 aws s3 mb s3://${PROJECT_NAME}-bucket-general-files;
 aws s3 mb s3://${PROJECT_NAME}-transform;
+
 }
 wait 
 
@@ -77,5 +78,16 @@ RULE_ARN=$(aws events list-rules --name ${PROJECT_NAME}-event-5minutetrigger --q
 
 aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
  --statement-id lambda1 --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn ${RULE_ARN}
+
+
+#Glue Role
+aws iam create-role --role-name AWSGlueServiceRole-${PROJECT_NAME} --assume-role-policy-document \
+'{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "glue.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null;
+
+aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole;
+aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
+
+
+#Glue Role -- export 
 
 
