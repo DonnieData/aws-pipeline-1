@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata2
+PROJECT_NAME=apidata1
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -14,8 +14,8 @@ aws s3 mb s3://${PROJECT_NAME}-transform;
 wait 
 
 # parameter/variable file
-echo '{"project_name":'${PROJECT_NAME}', "account_id": '${ACCNT_ID}'}' > samp.json
-aws s3 cp samp.json s3://${PROJECT_NAME}-bucket-general-files/samp.json
+#echo '{"project_name":'${PROJECT_NAME}', "account_id": '${ACCNT_ID}'}' > samp.json
+#aws s3 cp samp.json s3://${PROJECT_NAME}-bucket-general-files/samp.json
 
 #get build files for lambda get data funciton 
 {
@@ -84,10 +84,13 @@ aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
 aws iam create-role --role-name AWSGlueServiceRole-${PROJECT_NAME} --assume-role-policy-document \
 '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "glue.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null;
 
-aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole;
-aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
-
 
 #Glue Role -- export 
+aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole;
+aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
+#aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
+
+
+
 
 
