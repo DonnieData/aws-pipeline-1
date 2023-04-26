@@ -84,12 +84,30 @@ aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
 aws iam create-role --role-name AWSGlueServiceRole-${PROJECT_NAME} --assume-role-policy-document \
 '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "glue.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null;
 
-
-#Glue Role -- export 
 aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole;
 aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
 #aws iam attach-role-policy --role-name AWSGlueServiceRole-${PROJECT_NAME} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess;
 
+wait 
+#----Glue Job
+#script for job 
+{
+curl -o glujob1.py https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/glue/glujob1.py;
+aws s3 cp glujob1.py s3://${PROJECT_NAME}-bucket-general-files
+}
+
+ #params fro job 
+echo '{
+    "--source_bucket": "${xx}-bucket-rawjson" ,
+    "--targert_bucket": "${xx}-transform"
+}' > ~/gluejob1params.json
+
+#create job 
+aws glue create-job \
+--name gluejob1 \
+--role AWSGlueServiceRole-${PROJECT_NAME} \
+--command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py \
+--default-arguments file://~/gluejob1params.json;
 
 
 

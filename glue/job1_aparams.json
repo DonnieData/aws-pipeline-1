@@ -1,0 +1,21 @@
+{
+    "--source_bucket": "${PROJECT_NAME}-bucket-rawjson" ,
+    "--targert_bucket":"${PROJECT_NAME}-transform"
+}
+
+
+"${xx}-transform"
+
+{}
+echo
+'{
+    "--source_bucket": "${xx}-bucket-rawjson" ,
+    "--targert_bucket":"${xx}-transform"
+}'
+
+
+
+echo "{
+    "--source_bucket": "${xx}-bucket-rawjson" ,
+    "--targert_bucket": "${xx}-transform"
+}"
