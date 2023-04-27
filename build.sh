@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata1
+PROJECT_NAME=apidata2
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -75,7 +75,6 @@ aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
 #add event permissions to lambda function
 RULE_ARN=$(aws events list-rules --name ${PROJECT_NAME}-event-5minutetrigger --query 'Rules[0].Arn' --output text)
 
-
 aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
  --statement-id lambda1 --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn ${RULE_ARN}
 
@@ -96,19 +95,24 @@ curl -o glujob1.py https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/m
 aws s3 cp glujob1.py s3://${PROJECT_NAME}-bucket-general-files
 }
 
- #params fro job 
-echo '{
-    "--source_bucket": "${xx}-bucket-rawjson" ,
-    "--targert_bucket": "${xx}-transform"
-}' > ~/gluejob1params.json
+ #params fro job  cat gluejob1params.json
+
+echo "{
+    \"--source_bucket\": \"$PROJECT_NAME-bucket-rawjson\",
+    \"--target_bucket\": \"$PROJECT_NAME-transform\"
+}" > ~/gluejob1params.json
 
 #create job 
 aws glue create-job \
---name gluejob1 \
+--name gluejob1-${PROJECT_NAME} \
 --role AWSGlueServiceRole-${PROJECT_NAME} \
---command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py \
+--command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py,PythonVersion=3.9 \
 --default-arguments file://~/gluejob1params.json;
 
 
+#state machine 
 
 
+#step role polices 
+StepFunctionsExecutionRoleWithXRayAccessPolicy
+StepFunctionsExecutionRoleWithGlueJobRunManagementFullAccessPolicy	

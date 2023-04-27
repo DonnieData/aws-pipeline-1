@@ -57,7 +57,7 @@ def load_data(buffer_data,target_bucket,filename):
 
 
     
-json_file = get_source_file()
+json_file = get_source_file(args['source_bucket'])
 
 new_name = json_file.strip(".json") +"_transformed.csv"
 
