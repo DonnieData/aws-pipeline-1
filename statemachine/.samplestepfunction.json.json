@@ -1,0 +1,252 @@
+
+        {
+            "Comment": "A HELLO World example of the Amazon States Language using Pass states...",
+            "StartAt": "Validate input csv",
+            "States": {
+                "Validate input csv": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${InputValidationFunction}",
+                    "Next": "Validation Success?",
+                    "ResultPath": "$.taskresult"
+                },
+                "Validation Success?": {
+                    "Type": "Choice",
+                    "Choices": [
+                        {
+                            "Variable": "$.taskresult.Validation",
+                            "StringEquals": "SUCCESS",
+                            "Next": "Start Crawler For Raw File"
+                        },
+                        {
+                            "Variable": "$.taskresult.Validation",
+                            "StringEquals": "FAILURE",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ]
+                },
+                "FAIL - Move file to error folder": {
+                    "Type": "Task",
+                    "Next": "Error Notification",
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ArchiveFunction}"
+                },
+                "Error Notification": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+                    "Parameters": {
+                           "Message.$": "$",
+                           "TopicArn": "${SNSTopic}"
+                    },
+                    "Next": "Fail"
+                },
+                "Start Crawler For Raw File": {
+                    "Type": "Task",
+                    "ResultPath": "$.taskresult",
+                    "ResultSelector": {
+                        "cnt": "0",
+                        "crawler_name": "${CrawlRawFile}"
+                    },
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StartCrawlerFunction}",
+                    "Parameters": {
+                        "Crawler_Name": "${CrawlRawFile}"
+                    },
+                    "Retry": [
+                        {
+                            "ErrorEquals": [
+                                "CrawlerRunningException"
+                            ],
+                            "IntervalSeconds": 10,
+                            "MaxAttempts": 10,
+                            "BackoffRate": 2
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "ErrorEquals": [
+                                "CrawlerRunningException"
+                            ],
+                            "Comment": "Crawler is running for long time",
+                            "Next": "FAIL - Move file to error folder"
+                        },
+                        {
+                            "ErrorEquals": [
+                                "States.ALL"
+                            ],
+                            "Comment": "Error fall back",
+                            "ResultPath": "$.error-info",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ],
+                    "Next": "Raw File Crawler Status Check"
+                },
+                "Raw File Crawler Status Check": {
+                    "Type": "Task",
+                    "InputPath": "$.taskresult",
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CrawlerStatusCheckFunction}",
+                    "Next": "Raw File Crawler Finished?",
+                    "ResultPath": "$.taskresult"
+                },
+                "Raw File Crawler Finished?": {
+                    "Type": "Choice",
+                    "Choices": [
+                        {
+                            "Or": [
+                                {
+                                    "Variable": "$.taskresult.Status",
+                                    "StringEquals": "STOPPING"
+                                },
+                                {
+                                    "Variable": "$.taskresult.Status",
+                                    "StringEquals": "RUNNING"
+                                }
+                            ],
+                            "Next": "Raw File Crawler Wait"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "READY",
+                            "Next": "Run Glue Job"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "RETRYLIMITREACH",
+                            "Next": "FAIL - Move file to error folder"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "FAILED",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ],
+                    "Default": "FAIL - Move file to error folder"
+                },
+                "Raw File Crawler Wait": {
+                    "Type": "Wait",
+                    "Seconds": 30,
+                    "Next": "Raw File Crawler Status Check"
+                },
+                "Run Glue Job": {
+                    "Type": "Task",
+                    "Next": "Start Crawler For Partitioned File",
+                    "ResultPath": null,
+                    "Resource": "arn:aws:states:::glue:startJobRun.sync",
+                    "Parameters": {
+                        "JobName": "${GlueJob}"
+                    },
+                "Catch": [
+                        {
+                            "ErrorEquals": [
+                                "States.ALL"
+                            ],
+                            "Comment": "Error fall back for glue job",
+                            "ResultPath": "$.error-info",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ]
+                },
+                "Start Crawler For Partitioned File": {
+                    "Type": "Task",
+                    "ResultPath": "$.taskresult",
+                    "ResultSelector": {
+                        "cnt": "0",
+                        "crawler_name": "${CrawlPartitionedFile}"
+                    },
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StartCrawlerFunction}",
+                    "Parameters": {
+                        "Crawler_Name": "${CrawlPartitionedFile}"
+                    },
+                    "Retry": [
+                        {
+                            "ErrorEquals": [
+                                "CrawlerRunningException"
+                            ],
+                            "IntervalSeconds": 10,
+                            "MaxAttempts": 10,
+                            "BackoffRate": 2
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "ErrorEquals": [
+                                "CrawlerRunningException"
+                            ],
+                            "Comment": "Crawler is running for long time",
+                            "Next": "FAIL - Move file to error folder"
+                        },
+                        {
+                            "ErrorEquals": [
+                                "States.ALL"
+                            ],
+                            "Comment": "Error fall back",
+                            "ResultPath": "$.error-info",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ],
+                    "Next": "Partitioned File Crawler Status Check"
+                },
+                "Partitioned File Crawler Status Check": {
+                    "Type": "Task",
+                    "InputPath": "$.taskresult",
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CrawlerStatusCheckFunction}",
+                    "Next": "Partitioned File Crawler Finished?",
+                    "ResultPath": "$.taskresult"
+                },
+                "Partitioned File Crawler Finished?": {
+                    "Type": "Choice",
+                    "Choices": [
+                        {
+                            "Or": [
+                                {
+                                    "Variable": "$.taskresult.Status",
+                                    "StringEquals": "STOPPING"
+                                },
+                                {
+                                    "Variable": "$.taskresult.Status",
+                                    "StringEquals": "RUNNING"
+                                }
+                            ],
+                            "Next": "Partitioned File Crawler Wait"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "READY",
+                            "Next": "Move file to archive"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "RETRYLIMITREACH",
+                            "Next": "FAIL - Move file to error folder"
+                        },
+                        {
+                            "Variable": "$.taskresult.Status",
+                            "StringEquals": "FAILED",
+                            "Next": "FAIL - Move file to error folder"
+                        }
+                    ],
+                    "Default": "FAIL - Move file to error folder"
+                },
+                "Partitioned File Crawler Wait": {
+                    "Type": "Wait",
+                    "Seconds": 30,
+                    "Next": "Partitioned File Crawler Status Check"
+                },
+                "Fail": {
+                    "Type": "Fail",
+                    "Cause": "validation failed",
+                    "Error": "ValidationError"
+                },
+                "Move file to archive": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ArchiveFunction}",
+                    "Next": "Success Notification"
+                },
+                "Success Notification": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+                    "Parameters": {
+                           "Message.$": "$",
+                           "TopicArn": "${SNSTopic}"
+                    },
+                    "End": true
+                }
+            }
+        }

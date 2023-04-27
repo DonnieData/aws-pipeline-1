@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata2
+PROJECT_NAME=apidata
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 
@@ -114,5 +114,5 @@ aws glue create-job \
 
 
 #step role polices 
-StepFunctionsExecutionRoleWithXRayAccessPolicy
-StepFunctionsExecutionRoleWithGlueJobRunManagementFullAccessPolicy	
+#StepFunctionsExecutionRoleWithXRayAccessPolicy
+#StepFunctionsExecutionRoleWithGlueJobRunManagementFullAccessPolicy	
