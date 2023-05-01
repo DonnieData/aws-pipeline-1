@@ -1,0 +1,72 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "550bb4a3-b995-441e-b218-9e46644238ec": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 490,
+                    "y": 200
+                },
+                "z": 0
+            },
+            "d4a06d67-8929-4a72-8cfa-023312aef7d8": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 590,
+                    "y": 200
+                },
+                "z": 0
+            },
+            "6b5c276a-0a9c-4a06-80d4-7d612695bc9c": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 700,
+                    "y": 200
+                },
+                "z": 0
+            }
+        }
+    },
+    "Resources": {
+        "rawjs": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "550bb4a3-b995-441e-b218-9e46644238ec"
+                }
+            },
+            "DeletionPolicy": "Retain"
+        },
+        "csvd": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "d4a06d67-8929-4a72-8cfa-023312aef7d8"
+                }
+            },
+            "DeletionPolicy": "Retain"
+        },
+        "parq": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "6b5c276a-0a9c-4a06-80d4-7d612695bc9c"
+                }
+            },
+            "DeletionPolicy": "Retain"
+        }
+    }
+}
