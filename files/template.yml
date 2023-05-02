@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    99168c3d-6818-4f56-b29f-162380b8e99a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 150
+      z: 1
+      embeds: []
+    4c8e2e4f-2f5b-47f6-a5b4-ca8413716400:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 120
+        'y': 180
+      z: 1
+      embeds: []
+    5ef5d669-e5a1-4173-b779-b2ed4af35b39:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 390
+        'y': 180
+      z: 1
+      embeds: []
+    50c52a7a-53c6-46cd-98bf-da4787b4568d:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 30
+        'y': 110
+      z: 1
+      embeds: []
+    ff3892f4-66ba-42a9-8a2b-00ae68d7485f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 30
+        'y': 200
+      z: 1
+      embeds: []
+    1dfb60b4-11b9-4060-842c-74e6ccc68a53:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 30
+        'y': 30
+      z: 1
+      embeds: []
+Resources:
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 99168c3d-6818-4f56-b29f-162380b8e99a
+  IAMP3WB5U:
+    Type: 'AWS::IAM::Policy'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4c8e2e4f-2f5b-47f6-a5b4-ca8413716400
+  apidatalambdagetdata:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: 'arn:aws:iam::839712734073:role/apidata-lambda-ex'
+      Environment:
+        Variables:
+          raw_data_bucket: apidata-bucket-rawjson
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+  ApidataBucketRawjson:
+    Type: 'AWS::S3::Bucket'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 50c52a7a-53c6-46cd-98bf-da4787b4568d
+  ApidataBucketCsv:
+    Type: 'AWS::S3::Bucket'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
+  ApidataBucketGeneralfiles:
+    Type: 'AWS::S3::Bucket'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1dfb60b4-11b9-4060-842c-74e6ccc68a53

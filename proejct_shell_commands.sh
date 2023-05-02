@@ -50,3 +50,16 @@ aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expre
 aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
 --targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
 
+
+
+aws s3api get-bucket-logging --bucket apidata-bucket-rawjson --query 'LoggingEnabled' --output yaml > s3rawjsonconfig.yml
+
+~/s3rawjsonconfig.yml
+
+aws s3api get-bucket --bucket ApidataBucketRawjson
+
+ApidataBucketCsv
+ApidataBucketGeneralfiles
+
+
+#cloud formation 
