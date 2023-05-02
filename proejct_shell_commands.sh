@@ -63,3 +63,9 @@ ApidataBucketGeneralfiles
 
 
 #cloud formation 
+
+aws glue get-job --job-name gluejob1-apidata1 --query 'Job' --output json > my-glue-job1.json
+
+aws glue get-job --job-name gluejob1-apidata1 --query 'Job' --output yaml
+
+~/my-glue-job1.json

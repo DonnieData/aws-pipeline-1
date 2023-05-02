@@ -24,8 +24,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 390
-        'y': 180
+        x: 210
+        'y': 40
       z: 1
       embeds: []
     50c52a7a-53c6-46cd-98bf-da4787b4568d:
@@ -54,6 +54,15 @@ Metadata:
         x: 30
         'y': 30
       z: 1
+      embeds: []
+    919716c8-4974-4ddd-a24d-f9fd2200a7f1:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 380
+        'y': 50
+      z: 0
       embeds: []
 Resources:
   LambdaRole:
@@ -118,3 +127,26 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 1dfb60b4-11b9-4060-842c-74e6ccc68a53
+  jsontocsv:
+    Type: 'AWS::Glue::Job'
+    Properties:
+      Name: gluejob1-apidata1
+      Role: AWSGlueServiceRole-apidata1
+      CreatedOn: '2023-05-02T21:28:11.014000+00:00'
+      LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
+      ExecutionProperty:
+        MaxConcurrentRuns: 1
+      Command:
+        Name: pythonshell
+        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
+        PythonVersion: '3.9'
+      DefaultArguments:
+        '--source_bucket': apidata1-bucket-rawjson
+        '--target_bucket': apidata1-transform
+      MaxRetries: 0
+      AllocatedCapacity: 0
+      Timeout: 2880
+      MaxCapacity: 0.0625
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1

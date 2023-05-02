@@ -113,10 +113,6 @@ aws glue create-job \
 #state machine 
 
 
-
 #step role polices 
 #StepFunctionsExecutionRoleWithXRayAccessPolicy
 #StepFunctionsExecutionRoleWithGlueJobRunManagementFullAccessPolicy	
-
-
-
