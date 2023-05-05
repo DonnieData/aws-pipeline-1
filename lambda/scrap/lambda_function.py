@@ -5,7 +5,6 @@ import requests
 import time 
 
 def lambda_handler(event, context):
-    result = {}
     #get correct bucket name 
     raw_data_bucket_name = os.environ.get("raw_data_bucket")
     #time for saving 
@@ -19,7 +18,10 @@ def lambda_handler(event, context):
 
     # Check if data was retrieved
     if len(data) <= 1:
-        result['STATUS'] = 'failed'
+        return {
+            'statusCode': 404,
+            'body': 'No data was retrieved from the API'
+        }
 
     # Save the data to S3 bucket
     s3 = boto3.resource('s3')
@@ -30,7 +32,8 @@ def lambda_handler(event, context):
         Body=json.dumps(data)
     )
 
-    result['STATUS'] = "success"
     # Return a response
-
-    return result
+    return {
+        'statusCode': 200,
+        'body': 'Data saved to S3 bucket'
+    }

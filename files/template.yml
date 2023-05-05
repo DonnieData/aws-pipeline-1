@@ -6,35 +6,31 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 300
-        'y': 150
+        x: 360
+        'y': 80
       z: 1
       embeds: []
-    4c8e2e4f-2f5b-47f6-a5b4-ca8413716400:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 120
-        'y': 180
-      z: 1
-      embeds: []
+      isassociatedwith:
+        - f861f418-7451-4c61-85e3-3f4ff84d66cb
     5ef5d669-e5a1-4173-b779-b2ed4af35b39:
       size:
         width: 60
         height: 60
       position:
-        x: 210
-        'y': 40
+        x: 200
+        'y': 90
       z: 1
       embeds: []
+      dependson:
+        - 50c52a7a-53c6-46cd-98bf-da4787b4568d
+        - 99168c3d-6818-4f56-b29f-162380b8e99a
     50c52a7a-53c6-46cd-98bf-da4787b4568d:
       size:
         width: 60
         height: 60
       position:
         x: 30
-        'y': 110
+        'y': 100
       z: 1
       embeds: []
     ff3892f4-66ba-42a9-8a2b-00ae68d7485f:
@@ -43,16 +39,7 @@ Metadata:
         height: 60
       position:
         x: 30
-        'y': 200
-      z: 1
-      embeds: []
-    1dfb60b4-11b9-4060-842c-74e6ccc68a53:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 30
-        'y': 30
+        'y': 170
       z: 1
       embeds: []
     919716c8-4974-4ddd-a24d-f9fd2200a7f1:
@@ -60,37 +47,88 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 380
-        'y': 50
+        x: 200
+        'y': 170
+      z: 0
+      embeds: []
+      dependson:
+        - ff3892f4-66ba-42a9-8a2b-00ae68d7485f
+        - 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+    f861f418-7451-4c61-85e3-3f4ff84d66cb:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 470
+        'y': 80
+      z: 0
+      embeds: []
+    d3f03a86-d8e9-405a-9a6b-727dd5320be3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 460
+        'y': 170
+      z: 0
+      embeds: []
+    6a4bbb58-9b27-4185-bcd1-4968fdfef6c8:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 360
+        'y': 170
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - d3f03a86-d8e9-405a-9a6b-727dd5320be3
+    895dfb64-c5ed-4153-a5c9-e9610521886e:
+      source:
+        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+      target:
+        id: d3f03a86-d8e9-405a-9a6b-727dd5320be3
+      z: 2
+    5854a4be-e8f9-4390-9b3c-14dd2e9a676b:
+      source:
+        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
+      target:
+        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+      z: 3
+    bff97e0b-352f-4882-8d31-86436d803034:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 200
+        'y': 270
+      z: 0
+      embeds: []
+      dependson:
+        - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
+        - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+    1e076596-cfd6-4b07-961f-7b16966e4075:
+      source:
+        id: bff97e0b-352f-4882-8d31-86436d803034
+      target:
+        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
+      z: 4
+    cd77c734-04fe-4ac4-8976-67e6ad953599:
+      source:
+        id: bff97e0b-352f-4882-8d31-86436d803034
+      target:
+        id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+      z: 5
+    d6a51393-6865-40de-99ef-fc7a99b39746:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 350.3143503829611
+        'y': 285.76549698326784
       z: 0
       embeds: []
 Resources:
-  LambdaRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: ''
-            Effect: Allow
-            Principal:
-              Service:
-                - events.amazonaws.com
-                - lambda.amazonaws.com
-                - apigateway.amazonaws.com
-            Action: 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 99168c3d-6818-4f56-b29f-162380b8e99a
-  IAMP3WB5U:
-    Type: 'AWS::IAM::Policy'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 4c8e2e4f-2f5b-47f6-a5b4-ca8413716400
   apidatalambdagetdata:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -109,6 +147,9 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+    DependsOn:
+      - ApidataBucketRawjson
+      - pipelinestatemachine
   ApidataBucketRawjson:
     Type: 'AWS::S3::Bucket'
     Properties: {}
@@ -121,12 +162,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
-  ApidataBucketGeneralfiles:
-    Type: 'AWS::S3::Bucket'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 1dfb60b4-11b9-4060-842c-74e6ccc68a53
   jsontocsv:
     Type: 'AWS::Glue::Job'
     Properties:
@@ -150,3 +185,78 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
+    DependsOn:
+      - ApidataBucketCsv
+      - gluerole
+  gluemanagedpolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d3f03a86-d8e9-405a-9a6b-727dd5320be3
+  lambdamanagedpolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Version: 2012-10-17
+      Statement:
+        - Sid: VisualEditor0
+          Effect: Allow
+          Action:
+            - 'events:PutEvents'
+            - 'lambda:ListFunctions'
+            - 'lambda:InvokeFunction'
+          Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f861f418-7451-4c61-85e3-3f4ff84d66cb
+  gluerole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref gluemanagedpolicy
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+  SFSM2H23U:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: bff97e0b-352f-4882-8d31-86436d803034
+    DependsOn:
+      - jsontocsv
+      - apidatalambdagetdata
+  pipelinestatemachine:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+        - !Ref lambdamanagedpolicy
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 99168c3d-6818-4f56-b29f-162380b8e99a
+  statemachineexecutionrole:
+    Type: 'AWS::IAM::Role'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6a51393-6865-40de-99ef-fc7a99b39746

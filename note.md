@@ -4,3 +4,4 @@
 - create lambda funciton 
 - update role permissions for lambda funciton
 
+pass paramters (filename) to glue job within state machine from lambda 
