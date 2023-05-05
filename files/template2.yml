@@ -1,0 +1,5 @@
+--create two templates 
+
+then one stack can be delpolyed 
+then a lambda function can be ran to load the scripts
+then we run the next stack 
