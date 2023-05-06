@@ -65,18 +65,18 @@ aws iam update-assume-role-policy \
 wait 
 #eventbridge 
 
-aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(3 minutes)" --state ENABLED 
+#aws events put-rule --name ${PROJECT_NAME}-event-5minutetrigger --schedule-expression "rate(3 minutes)" --state ENABLED 
 #--role-arn arn:aws:iam::${ACCNT_ID}:role/${PROJECT_NAME}-lambda-ex
-wait 
-aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
---targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
+#wait 
+#aws events put-targets --rule ${PROJECT_NAME}-event-5minutetrigger \
+#--targets "Id"="${PROJECT_NAME}-lambda-getdata","Arn"="arn:aws:lambda:us-east-1:${ACCNT_ID}:function:${PROJECT_NAME}-lambda-getdata";
 
 #---------------
 #add event permissions to lambda function
-RULE_ARN=$(aws events list-rules --name ${PROJECT_NAME}-event-5minutetrigger --query 'Rules[0].Arn' --output text)
+#RULE_ARN=$(aws events list-rules --name ${PROJECT_NAME}-event-5minutetrigger --query 'Rules[0].Arn' --output text)
 
-aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
- --statement-id lambda1 --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn ${RULE_ARN}
+#aws lambda add-permission --function-name ${PROJECT_NAME}-lambda-getdata \
+ #--statement-id lambda1 --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn ${RULE_ARN}
 
 
 #Glue Role
@@ -106,8 +106,8 @@ echo "{
 aws glue create-job \
 --name gluejob1-${PROJECT_NAME} \
 --role AWSGlueServiceRole-${PROJECT_NAME} \
---command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py,PythonVersion=3.9 \
---default-arguments file://~/gluejob1params.json;
+--command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py,PythonVersion=3.9; 
+#--default-arguments file://~/gluejob1params.json;
 
 
 #state machine 

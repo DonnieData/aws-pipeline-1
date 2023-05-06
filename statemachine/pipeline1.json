@@ -47,15 +47,16 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::glue:startJobRun",
       "Parameters": {
-        "JobName": "${GlueJob}",
+        "JobName": "gluejob1-apidata",
         "Arguments": {
-          "--source_bucket": "{$PROJECT_NAME}-",
+          "--source_bucket": "{$PROJECT_NAME}-bucket-rawjson",
           "--target_bucket": "{$PROJECT_NAME}-transform",
           "--file_name": "$.taskresult.file_name"
         }
       },
       "Next": "Success",
-      "ResultPath": "$.glueresult"
+      "ResultPath": "$.glueresult",
+      "InputPath": "$.taskresult"
     },
     "Success": {
       "Type": "Succeed"

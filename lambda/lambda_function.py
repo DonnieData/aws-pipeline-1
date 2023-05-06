@@ -31,6 +31,7 @@ def lambda_handler(event, context):
     )
 
     result['STATUS'] = "success"
+    result['file_name'] = object_key
     # Return a response
 
     return result
