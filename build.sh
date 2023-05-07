@@ -91,7 +91,7 @@ wait
 #----Glue Job
 #script for job 
 {
-curl -o glujob1.py https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/glue/glujob1.py;
+curl -o glujob1.py https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/glue/gluejob_transform1.py;
 aws s3 cp glujob1.py s3://${PROJECT_NAME}-bucket-general-files
 }
 
@@ -106,7 +106,7 @@ echo "{
 aws glue create-job \
 --name gluejob1-${PROJECT_NAME} \
 --role AWSGlueServiceRole-${PROJECT_NAME} \
---command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py,PythonVersion=3.9; 
+--command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py, PythonVersion=3.9; 
 #--default-arguments file://~/gluejob1params.json;
 
 
