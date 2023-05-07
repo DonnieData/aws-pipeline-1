@@ -7,7 +7,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-1:893725594362:function:apidata1-lambda-getdata:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-east-1:115625491345:function:apidata-lambda-getdata:$LATEST"
       },
       "Retry": [
         {
@@ -26,7 +26,7 @@
       "TimeoutSeconds": 300,
       "ResultSelector": {
         "STATUS.$": "$.Payload.STATUS",
-        "file_name": "$.Payload.file_name"
+        "file_name.$": "$.Payload.file_name"
       }
     },
     "Choice": {
@@ -51,9 +51,9 @@
       "Parameters": {
         "JobName": "gluejob1-apidata",
         "Arguments": {
-          "--source_bucket": "{$PROJECT_NAME}-bucket-rawjson",
-          "--target_bucket": "{$PROJECT_NAME}-transform",
-          "--file_name": "$.file_name"
+          "--source_bucket": "apidata-bucket-rawjson",
+          "--target_bucket": "apidata-transform",
+          "--file_name.$": "$.file_name"
         }
       },
       "Next": "Success"
