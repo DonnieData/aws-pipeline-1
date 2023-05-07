@@ -1,6 +1,6 @@
 #variables 
 {
-PROJECT_NAME=apidata
+PROJECT_NAME=apidata1
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 }
 wait 

@@ -7,7 +7,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-1:653375228417:function:apidata-lambda-getdata:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-east-1:893725594362:function:apidata1-lambda-getdata:$LATEST"
       },
       "Retry": [
         {
@@ -23,40 +23,40 @@
         }
       ],
       "Next": "Choice",
-      "ResultPath": "$.taskresult"
+      "TimeoutSeconds": 300,
+      "ResultSelector": {
+        "STATUS.$": "$.Payload.STATUS",
+        "file_name": "$.Payload.file_name"
+      }
     },
     "Choice": {
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.taskresult.Status",
+          "Variable": "$.STATUS",
           "StringEquals": "success",
           "Next": "Glue StartJobRun"
         },
         {
-          "Variable": "$.taskresult.Status",
+          "Variable": "$.STATUS",
           "StringEquals": "failed",
           "Next": "Fail"
         }
       ],
-      "Default": "Fail",
-      "OutputPath": "$.taskresult",
-      "InputPath": "$.taskresult"
+      "Default": "Fail"
     },
     "Glue StartJobRun": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::glue:startJobRun",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
       "Parameters": {
         "JobName": "gluejob1-apidata",
         "Arguments": {
           "--source_bucket": "{$PROJECT_NAME}-bucket-rawjson",
           "--target_bucket": "{$PROJECT_NAME}-transform",
-          "--file_name": "$.taskresult.file_name"
+          "--file_name": "$.file_name"
         }
       },
-      "Next": "Success",
-      "ResultPath": "$.glueresult",
-      "InputPath": "$.taskresult"
+      "Next": "Success"
     },
     "Success": {
       "Type": "Succeed"
