@@ -106,7 +106,7 @@ echo "{
 aws glue create-job \
 --name gluejob1-${PROJECT_NAME} \
 --role AWSGlueServiceRole-${PROJECT_NAME} \
---command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py, PythonVersion=3.9; 
+--command Name=pythonshell,ScriptLocation=s3://${PROJECT_NAME}-bucket-general-files/glujob1.py,PythonVersion=3.9;
 #--default-arguments file://~/gluejob1params.json;
 
 

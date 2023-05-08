@@ -83,19 +83,16 @@ Metadata:
       embeds: []
       isassociatedwith:
         - d3f03a86-d8e9-405a-9a6b-727dd5320be3
-    895dfb64-c5ed-4153-a5c9-e9610521886e:
-      source:
-        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
-      target:
-        id: d3f03a86-d8e9-405a-9a6b-727dd5320be3
-      z: 2
-    5854a4be-e8f9-4390-9b3c-14dd2e9a676b:
-      source:
-        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
-      target:
-        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
-      z: 3
-    bff97e0b-352f-4882-8d31-86436d803034:
+    d6a51393-6865-40de-99ef-fc7a99b39746:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 350.3143503829611
+        'y': 285.76549698326784
+      z: 0
+      embeds: []
+    aac53e5f-9e87-4280-a7bc-9030b912511b:
       size:
         width: 60
         height: 60
@@ -107,27 +104,18 @@ Metadata:
       dependson:
         - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
         - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
-    1e076596-cfd6-4b07-961f-7b16966e4075:
+    d0339749-f663-4d0b-9abb-09fba62e4de9:
       source:
-        id: bff97e0b-352f-4882-8d31-86436d803034
+        id: aac53e5f-9e87-4280-a7bc-9030b912511b
       target:
         id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
-      z: 4
-    cd77c734-04fe-4ac4-8976-67e6ad953599:
+      z: 11
+    08a67d69-d17a-47c8-99ad-c08cde2f7696:
       source:
-        id: bff97e0b-352f-4882-8d31-86436d803034
+        id: aac53e5f-9e87-4280-a7bc-9030b912511b
       target:
         id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
-      z: 5
-    d6a51393-6865-40de-99ef-fc7a99b39746:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 350.3143503829611
-        'y': 285.76549698326784
-      z: 0
-      embeds: []
+      z: 12
 Resources:
   apidatalambdagetdata:
     Type: 'AWS::Lambda::Function'
@@ -175,9 +163,6 @@ Resources:
         Name: pythonshell
         ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
         PythonVersion: '3.9'
-      DefaultArguments:
-        '--source_bucket': apidata1-bucket-rawjson
-        '--target_bucket': apidata1-transform
       MaxRetries: 0
       AllocatedCapacity: 0
       Timeout: 2880
@@ -224,15 +209,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
-  SFSM2H23U:
-    Type: 'AWS::StepFunctions::StateMachine'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: bff97e0b-352f-4882-8d31-86436d803034
-    DependsOn:
-      - jsontocsv
-      - apidatalambdagetdata
   pipelinestatemachine:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -260,3 +236,63 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d6a51393-6865-40de-99ef-fc7a99b39746
+  machine1:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: aac53e5f-9e87-4280-a7bc-9030b912511b
+    Properties:
+      TracingConfiguration:
+        Enabled: true
+      Definition:
+        Comment: A description of my state machine
+        StartAt: lambdagetdata
+        States:
+          lambdagetdata:
+            Type: Task
+            Resource: 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              Payload.$: $
+              FunctionName: >-
+                arn:aws:lambda:us-east-1:115625491345:function:apidata-lambda-getdata:$LATEST
+            Retry:
+              - ErrorEquals:
+                  - Lambda.ServiceException
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                  - Lambda.TooManyRequestsException
+                IntervalSeconds: 2
+                MaxAttempts: 6
+                BackoffRate: 2
+            Next: Choice
+            TimeoutSeconds: 300
+            ResultSelector:
+              STATUS.$: $.Payload.STATUS
+              file_name.$: $.Payload.file_name
+          Choice:
+            Type: Choice
+            Choices:
+              - Variable: $.STATUS
+                StringEquals: success
+                Next: Glue StartJobRun
+              - Variable: $.STATUS
+                StringEquals: failed
+                Next: Fail
+            Default: Fail
+          Glue StartJobRun:
+            Type: Task
+            Resource: 'arn:aws:states:::glue:startJobRun.sync'
+            Parameters:
+              JobName: gluejob1-apidata
+              Arguments:
+                '--source_bucket': apidata-bucket-rawjson
+                '--target_bucket': apidata-transform
+                '--file_name.$': $.file_name
+            Next: Success
+          Success:
+            Type: Succeed
+          Fail:
+            Type: Fail
+    DependsOn:
+      - jsontocsv
+      - apidatalambdagetdata
