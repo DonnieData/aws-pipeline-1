@@ -104,25 +104,13 @@ Metadata:
       dependson:
         - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
         - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
-    d0339749-f663-4d0b-9abb-09fba62e4de9:
-      source:
-        id: aac53e5f-9e87-4280-a7bc-9030b912511b
-      target:
-        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
-      z: 11
-    08a67d69-d17a-47c8-99ad-c08cde2f7696:
-      source:
-        id: aac53e5f-9e87-4280-a7bc-9030b912511b
-      target:
-        id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
-      z: 12
 Resources:
   apidatalambdagetdata:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri: 's3//${PROJECT_NAME}-bucket-general-files/api-func-deployment-package.zip'
+      CodeUri: !Sub 's3//${projectName}-bucket-general-files/api-func-deployment-package.zip'
       Description: ''
       MemorySize: 128
       Timeout: 300
@@ -140,20 +128,15 @@ Resources:
       - pipelinestatemachine
   ApidataBucketRawjson:
     Type: 'AWS::S3::Bucket'
-    Properties: {}
+    Properties:
+      BucketName: !Sub '${projectName}-bucket-rawjson'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 50c52a7a-53c6-46cd-98bf-da4787b4568d
-  ApidataBucketCsv:
-    Type: 'AWS::S3::Bucket'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
   jsontocsv:
     Type: 'AWS::Glue::Job'
     Properties:
-      Name: gluejob1-apidata1
+      Name: !Sub 'gluejob1-${projectName}'
       Role: AWSGlueServiceRole-apidata1
       CreatedOn: '2023-05-02T21:28:11.014000+00:00'
       LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
@@ -161,7 +144,7 @@ Resources:
         MaxConcurrentRuns: 1
       Command:
         Name: pythonshell
-        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
+        ScriptLocation: !Sub 's3://${proj}-bucket-general-files/glujob1.py'
         PythonVersion: '3.9'
       MaxRetries: 0
       AllocatedCapacity: 0
@@ -171,7 +154,7 @@ Resources:
       'AWS::CloudFormation::Designer':
         id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
     DependsOn:
-      - ApidataBucketCsv
+      - transform
       - gluerole
   gluemanagedpolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -244,7 +227,7 @@ Resources:
     Properties:
       TracingConfiguration:
         Enabled: true
-      Definition:
+      DefinitionString: !Sub 
         Comment: A description of my state machine
         StartAt: lambdagetdata
         States:
@@ -254,7 +237,7 @@ Resources:
             Parameters:
               Payload.$: $
               FunctionName: >-
-                arn:aws:lambda:us-east-1:115625491345:function:apidata-lambda-getdata:$LATEST
+                arn:aws:lambda:${AWS::Region}:{AWS::AccountId}:function:${projectName}-lambda-getdata:$LATEST
             Retry:
               - ErrorEquals:
                   - Lambda.ServiceException
@@ -283,10 +266,10 @@ Resources:
             Type: Task
             Resource: 'arn:aws:states:::glue:startJobRun.sync'
             Parameters:
-              JobName: gluejob1-apidata
+              JobName: 'gluejob1-${projectName}'
               Arguments:
-                '--source_bucket': apidata-bucket-rawjson
-                '--target_bucket': apidata-transform
+                '--source_bucket': '${projectName}-bucket-rawjson'
+                '--target_bucket': '${projectName}-transform'
                 '--file_name.$': $.file_name
             Next: Success
           Success:
@@ -296,3 +279,10 @@ Resources:
     DependsOn:
       - jsontocsv
       - apidatalambdagetdata
+  transform:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${projectName}-transform'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f

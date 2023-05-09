@@ -1,0 +1,68 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "lambdagetdata",
+    "States": {
+      "lambdagetdata": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$": "$",
+          "FunctionName": "arn:aws:lambda:${AWS::Region}:{AWS::AccountId}:function:${projectName}-lambda-getdata:$LATEST"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Choice",
+        "TimeoutSeconds": 300,
+        "ResultSelector": {
+          "STATUS.$": "$.Payload.STATUS",
+          "file_name.$": "$.Payload.file_name"
+        }
+      },
+      "Choice": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.STATUS",
+            "StringEquals": "success",
+            "Next": "Glue StartJobRun"
+          },
+          {
+            "Variable": "$.STATUS",
+            "StringEquals": "failed",
+            "Next": "Fail"
+          }
+        ],
+        "Default": "Fail"
+      },
+      "Glue StartJobRun": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Parameters": {
+          "JobName": "gluejob1-${projectName}",
+          "Arguments": {
+            "--source_bucket": "${projectName}-bucket-rawjson",
+            "--target_bucket": "${projectName}-transform",
+            "--file_name.$": "$.file_name"
+          }
+        },
+        "Next": "Success"
+      },
+      "Success": {
+        "Type": "Succeed"
+      },
+      "Fail": {
+        "Type": "Fail"
+      }
+    }
+  }
