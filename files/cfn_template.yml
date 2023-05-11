@@ -110,7 +110,7 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri: !Sub 's3//${projectName}-bucket-general-files/api-func-deployment-package.zip'
+      CodeUri: 's3//${PROJECT_NAME}-bucket-general-files/api-func-deployment-package.zip'
       Description: ''
       MemorySize: 128
       Timeout: 300
@@ -133,10 +133,17 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 50c52a7a-53c6-46cd-98bf-da4787b4568d
+  ApidataBucketCsv:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${projectName}-transform'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
   jsontocsv:
     Type: 'AWS::Glue::Job'
     Properties:
-      Name: !Sub 'gluejob1-${projectName}'
+      Name: gluejob1-apidata1
       Role: AWSGlueServiceRole-apidata1
       CreatedOn: '2023-05-02T21:28:11.014000+00:00'
       LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
@@ -144,7 +151,7 @@ Resources:
         MaxConcurrentRuns: 1
       Command:
         Name: pythonshell
-        ScriptLocation: !Sub 's3://${proj}-bucket-general-files/glujob1.py'
+        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
         PythonVersion: '3.9'
       MaxRetries: 0
       AllocatedCapacity: 0
@@ -154,7 +161,7 @@ Resources:
       'AWS::CloudFormation::Designer':
         id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
     DependsOn:
-      - transform
+      - ApidataBucketCsv
       - gluerole
   gluemanagedpolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -219,7 +226,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d6a51393-6865-40de-99ef-fc7a99b39746
-  machine1:
+  MyStepFunction:
     Type: 'AWS::StepFunctions::StateMachine'
     Metadata:
       'AWS::CloudFormation::Designer':
@@ -227,62 +234,28 @@ Resources:
     Properties:
       TracingConfiguration:
         Enabled: true
-      DefinitionString: !Sub 
-        Comment: A description of my state machine
-        StartAt: lambdagetdata
-        States:
-          lambdagetdata:
-            Type: Task
-            Resource: 'arn:aws:states:::lambda:invoke'
-            Parameters:
-              Payload.$: $
-              FunctionName: >-
-                arn:aws:lambda:${AWS::Region}:{AWS::AccountId}:function:${projectName}-lambda-getdata:$LATEST
-            Retry:
-              - ErrorEquals:
-                  - Lambda.ServiceException
-                  - Lambda.AWSLambdaException
-                  - Lambda.SdkClientException
-                  - Lambda.TooManyRequestsException
-                IntervalSeconds: 2
-                MaxAttempts: 6
-                BackoffRate: 2
-            Next: Choice
-            TimeoutSeconds: 300
-            ResultSelector:
-              STATUS.$: $.Payload.STATUS
-              file_name.$: $.Payload.file_name
-          Choice:
-            Type: Choice
-            Choices:
-              - Variable: $.STATUS
-                StringEquals: success
-                Next: Glue StartJobRun
-              - Variable: $.STATUS
-                StringEquals: failed
-                Next: Fail
-            Default: Fail
-          Glue StartJobRun:
-            Type: Task
-            Resource: 'arn:aws:states:::glue:startJobRun.sync'
-            Parameters:
-              JobName: 'gluejob1-${projectName}'
-              Arguments:
-                '--source_bucket': '${projectName}-bucket-rawjson'
-                '--target_bucket': '${projectName}-transform'
-                '--file_name.$': $.file_name
-            Next: Success
-          Success:
-            Type: Succeed
-          Fail:
-            Type: Fail
+      DefinitionString: !Sub >-
+        { "Comment": "A description of my state machine", "StartAt":
+        "lambdagetdata", "States": { "lambdagetdata": { "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke", "Parameters": {
+        "Payload.$": "$", "FunctionName":
+        "arn:aws:lambda:${AWS::Region}:{AWS::AccountId}:function:${projectName}-lambda-getdata:$LATEST"
+        }, "Retry": [ { "ErrorEquals": [ "Lambda.ServiceException",
+        "Lambda.AWSLambdaException", "Lambda.SdkClientException",
+        "Lambda.TooManyRequestsException" ], "IntervalSeconds": 2,
+        "MaxAttempts": 6, "BackoffRate": 2 } ], "Next": "Choice",
+        "TimeoutSeconds": 300, "ResultSelector": { "STATUS.$":
+        "$.Payload.STATUS", "file_name.$": "$.Payload.file_name" } }, "Choice":
+        { "Type": "Choice", "Choices": [ { "Variable": "$.STATUS",
+        "StringEquals": "success", "Next": "Glue StartJobRun" }, { "Variable":
+        "$.STATUS", "StringEquals": "failed", "Next": "Fail" } ], "Default":
+        "Fail" }, "Glue StartJobRun": { "Type": "Task", "Resource":
+        "arn:aws:states:::glue:startJobRun.sync", "Parameters": { "JobName":
+        "gluejob1-${projectName}", "Arguments": { "--source_bucket":
+        "${projectName}-bucket-rawjson", "--target_bucket":
+        "${projectName}-transform", "--file_name.$": "$.file_name" } }, "Next":
+        "Success" }, "Success": { "Type": "Succeed" }, "Fail": { "Type": "Fail"
+        } } }
     DependsOn:
       - jsontocsv
       - apidatalambdagetdata
-  transform:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      BucketName: !Sub '${projectName}-transform'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
