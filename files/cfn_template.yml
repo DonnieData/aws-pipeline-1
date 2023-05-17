@@ -325,7 +325,7 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri: 's3//${PROJECT_NAME}-bucket-general-files/api-func-deployment-package.zip'
+      CodeUri: !Sub 's3//${projectName}-bucket-general-files/api-func-deployment-package.zip'
       Description: ''
       MemorySize: 128
       Timeout: 300
