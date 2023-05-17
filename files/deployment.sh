@@ -6,10 +6,18 @@ aws s3 mb s3://${PROJECT_NAME}-bucket-general-files
 }
 
 wait 
+
 #lambda and glue code, cfn template
 {
+
 #curl -o parameters.json 
 #aws s3 cp parameters.json s3://${PROJECT_NAME}-bucket-general-files
+
+echo "{
+    \"ParameterKey\": \"projectName\",
+    \"ParameterValue\": \"$PROJECT_NAME\"
+}" > ~/cfnparams.json
+
 
 curl -o api-func-deployment-package.zip https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/lambda/api-func-deployment-package.zip;
 aws s3 cp api-func-deployment-package.zip s3://${PROJECT_NAME}-bucket-general-files
