@@ -104,6 +104,33 @@ Metadata:
       dependson:
         - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
         - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+    679a9e7c-69f0-464e-8c4e-1493e6083324:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 580
+        'y': 190
+      z: 0
+      embeds: []
+    ffe425c5-e80e-4ae4-b9d6-eb43f70305d9:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 580
+        'y': 280
+      z: 0
+      embeds: []
+    466232da-36cd-4088-953a-a7f46b8a47cb:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 490
+        'y': 320
+      z: 0
+      embeds: []
 Resources:
   apidatalambdagetdata:
     Type: 'AWS::Lambda::Function'
@@ -219,12 +246,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 99168c3d-6818-4f56-b29f-162380b8e99a
-  statemachineexecutionrole:
-    Type: 'AWS::IAM::Role'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: d6a51393-6865-40de-99ef-fc7a99b39746
   MyStepFunction:
     Type: 'AWS::StepFunctions::StateMachine'
     Metadata:
@@ -258,3 +279,51 @@ Resources:
     DependsOn:
       - jsontocsv
       - apidatalambdagetdata
+  statemachineRole:
+    Type: 'AWS::IAM::Role'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6a51393-6865-40de-99ef-fc7a99b39746
+  statemachineLambdaPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Version: 2012-10-17
+      Statement:
+        Effect: Allow
+        Action:
+          - 'lambda:InvokeFunction'
+        Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ffe425c5-e80e-4ae4-b9d6-eb43f70305d9
+  statemachineGluePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Version: 2012-10-17
+      Statement:
+        Effect: Allow
+        Action:
+          - 'glue:StartJobRun'
+          - 'glue:GetJobRun'
+          - 'glue:GetJobRuns'
+          - 'glue:BatchStopJobRun'
+        Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 679a9e7c-69f0-464e-8c4e-1493e6083324
+  statemachineXRayAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Version: 2012-10-17
+      Statement:
+        Effect: Allow
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+          - 'xray:GetSamplingRules'
+          - 'xray:GetSamplingTargets'
+        Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 466232da-36cd-4088-953a-a7f46b8a47cb
