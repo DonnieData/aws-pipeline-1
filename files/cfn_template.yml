@@ -21,9 +21,6 @@ Metadata:
         'y': 90
       z: 1
       embeds: []
-      dependson:
-        - 50c52a7a-53c6-46cd-98bf-da4787b4568d
-        - 99168c3d-6818-4f56-b29f-162380b8e99a
     50c52a7a-53c6-46cd-98bf-da4787b4568d:
       size:
         width: 60
@@ -101,7 +98,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 200
+        x: 250
         'y': 270
       z: 0
       embeds: []
@@ -109,6 +106,7 @@ Metadata:
         - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
         - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
         - d6a51393-6865-40de-99ef-fc7a99b39746
+        - d0a936ff-0386-4fe0-814d-9099607be091
     679a9e7c-69f0-464e-8c4e-1493e6083324:
       size:
         width: 60
@@ -136,28 +134,30 @@ Metadata:
         'y': 450
       z: 0
       embeds: []
+    d0a936ff-0386-4fe0-814d-9099607be091:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 190
+        'y': 180
+      z: 0
+      embeds: []
+      dependson:
+        - 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+    af9a6486-2baf-40cb-aba7-22d53e2b67a6:
+      source:
+        id: d0a936ff-0386-4fe0-814d-9099607be091
+      target:
+        id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
+      z: 11
+    731a9029-0f2c-455f-a3cc-83838b91a5bc:
+      source:
+        id: aac53e5f-9e87-4280-a7bc-9030b912511b
+      target:
+        id: d0a936ff-0386-4fe0-814d-9099607be091
+      z: 12
 Resources:
-  apidatalambdagetdata:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Handler: lambda_function.lambda_handler
-      Runtime: python3.9
-      CodeUri: 's3//${PROJECT_NAME}-bucket-general-files/api-func-deployment-package.zip'
-      Description: ''
-      MemorySize: 128
-      Timeout: 300
-      Role: 'arn:aws:iam::839712734073:role/apidata-lambda-ex'
-      Environment:
-        Variables:
-          raw_data_bucket: apidata-bucket-rawjson
-      RuntimeManagementConfig:
-        UpdateRuntimeOn: Auto
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
-    DependsOn:
-      - ApidataBucketRawjson
-      - pipelinestatemachine
   ApidataBucketRawjson:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -172,28 +172,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
-  jsontocsv:
-    Type: 'AWS::Glue::Job'
-    Properties:
-      Role: AWSGlueServiceRole-apidata1
-      CreatedOn: '2023-05-02T21:28:11.014000+00:00'
-      LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
-      ExecutionProperty:
-        MaxConcurrentRuns: 1
-      Command:
-        Name: pythonshell
-        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
-        PythonVersion: '3.9'
-      MaxRetries: 0
-      AllocatedCapacity: 0
-      Timeout: 2880
-      MaxCapacity: 0.0625
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 919716c8-4974-4ddd-a24d-f9fd2200a7f1
-    DependsOn:
-      - ApidataBucketCsv
-      - gluerole
   gluemanagedpolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties: {}
@@ -230,27 +208,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
-  pipelinestatemachine:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: ''
-            Effect: Allow
-            Principal:
-              Service:
-                - events.amazonaws.com
-                - lambda.amazonaws.com
-                - apigateway.amazonaws.com
-            Action: 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
-        - !Ref lambdamanagedpolicy
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 99168c3d-6818-4f56-b29f-162380b8e99a
   MyStepFunction:
     Type: 'AWS::StepFunctions::StateMachine'
     Metadata:
@@ -282,9 +239,9 @@ Resources:
         "Success" }, "Success": { "Type": "Succeed" }, "Fail": { "Type": "Fail"
         } } }
     DependsOn:
-      - jsontocsv
       - apidatalambdagetdata
       - statemachineRole
+      - jsontocsv
   statemachineRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -344,3 +301,66 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 466232da-36cd-4088-953a-a7f46b8a47cb
+  lambdarole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+        - !Ref lambdamanagedpolicy
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 99168c3d-6818-4f56-b29f-162380b8e99a
+  apidatalambdagetdata:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      CodeUri: 's3//${PROJECT_NAME}-bucket-general-files/api-func-deployment-package.zip'
+      Description: ''
+      MemorySize: 128
+      Timeout: 300
+      Role: !Ref lambdarole
+      Environment:
+        Variables:
+          raw_data_bucket: !Ref ApidataBucketRawjson
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+    DependsOn:
+      - ApidataBucketRawjson
+      - lambdarole
+  jsontocsv:
+    Type: 'AWS::Glue::Job'
+    Properties:
+      Role: AWSGlueServiceRole-apidata1
+      CreatedOn: '2023-05-02T21:28:11.014000+00:00'
+      LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
+      ExecutionProperty:
+        MaxConcurrentRuns: 1
+      Command:
+        Name: pythonshell
+        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
+        PythonVersion: '3.9'
+      MaxRetries: 0
+      AllocatedCapacity: 0
+      Timeout: 2880
+      MaxCapacity: 0.0625
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d0a936ff-0386-4fe0-814d-9099607be091
+    DependsOn:
+      - gluerole
