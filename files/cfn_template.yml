@@ -92,6 +92,10 @@ Metadata:
         'y': 285.76549698326784
       z: 0
       embeds: []
+      isassociatedwith:
+        - 679a9e7c-69f0-464e-8c4e-1493e6083324
+        - ffe425c5-e80e-4ae4-b9d6-eb43f70305d9
+        - 466232da-36cd-4088-953a-a7f46b8a47cb
     aac53e5f-9e87-4280-a7bc-9030b912511b:
       size:
         width: 60
@@ -104,13 +108,14 @@ Metadata:
       dependson:
         - 919716c8-4974-4ddd-a24d-f9fd2200a7f1
         - 5ef5d669-e5a1-4173-b779-b2ed4af35b39
+        - d6a51393-6865-40de-99ef-fc7a99b39746
     679a9e7c-69f0-464e-8c4e-1493e6083324:
       size:
         width: 60
         height: 60
       position:
-        x: 580
-        'y': 190
+        x: 500
+        'y': 280
       z: 0
       embeds: []
     ffe425c5-e80e-4ae4-b9d6-eb43f70305d9:
@@ -118,8 +123,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 580
-        'y': 280
+        x: 500
+        'y': 360
       z: 0
       embeds: []
     466232da-36cd-4088-953a-a7f46b8a47cb:
@@ -127,8 +132,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 490
-        'y': 320
+        x: 500
+        'y': 450
       z: 0
       embeds: []
 Resources:
@@ -279,9 +284,21 @@ Resources:
     DependsOn:
       - jsontocsv
       - apidatalambdagetdata
+      - statemachineRole
   statemachineRole:
     Type: 'AWS::IAM::Role'
-    Properties: {}
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref statemachineGluePolicy
+        - !Ref statemachineLambdaPolicy
+        - !Ref statemachineXRayAccess
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d6a51393-6865-40de-99ef-fc7a99b39746
