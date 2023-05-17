@@ -143,8 +143,6 @@ Metadata:
         'y': 180
       z: 0
       embeds: []
-      dependson:
-        - 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
     af9a6486-2baf-40cb-aba7-22d53e2b67a6:
       source:
         id: d0a936ff-0386-4fe0-814d-9099607be091
@@ -346,14 +344,12 @@ Resources:
   jsontocsv:
     Type: 'AWS::Glue::Job'
     Properties:
-      Role: AWSGlueServiceRole-apidata1
-      CreatedOn: '2023-05-02T21:28:11.014000+00:00'
-      LastModifiedOn: '2023-05-02T21:28:11.014000+00:00'
+      Role: !Ref gluerole
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Command:
         Name: pythonshell
-        ScriptLocation: 's3://apidata1-bucket-general-files/glujob1.py'
+        ScriptLocation: !Sub 's3://${projectName}-bucket-general-files/glujob1.py'
         PythonVersion: '3.9'
       MaxRetries: 0
       AllocatedCapacity: 0
