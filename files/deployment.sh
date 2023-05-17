@@ -1,6 +1,6 @@
 #create buckets, vars  
 {
-PROJECT_NAME=apidata
+PROJECT_NAME=apidata1 
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 aws s3 mb s3://${PROJECT_NAME}-bucket-general-files
 }
@@ -36,10 +36,7 @@ wait
 
 # deploy cfn  stack  
 
-aws cloudformation deploy --template-file s3://${PROJECT_NAME}-bucket-general-files/template.yml \
---stack-name ${PROJECT_NAME}-stack --parameter-overrides s3://${PROJECT_NAME}-bucket-general-files/cfnparams
+aws cloudformation deploy --template-file "s3://${PROJECT_NAME}-bucket-general-files/template.yml" \
+--stack-name ${PROJECT_NAME}-stack --parameter-overrides "s3://${PROJECT_NAME}-bucket-general-files/cfnparams.json"
 
 
-
-aws cloudformation package --template-file template.yml \ 
---s3-bucket s3://${PROJECT_NAME}-bucket-general-files
