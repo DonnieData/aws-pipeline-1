@@ -18,6 +18,8 @@ echo "{
     \"ParameterValue\": \"$PROJECT_NAME\"
 }" > ~/cfnparams.json
 
+aws s3 cp cfnparams.json s3://${PROJECT_NAME}-bucket-general-files
+
 
 curl -o api-func-deployment-package.zip https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/lambda/api-func-deployment-package.zip;
 aws s3 cp api-func-deployment-package.zip s3://${PROJECT_NAME}-bucket-general-files
@@ -33,6 +35,11 @@ wait
 
 
 # deploy cfn  stack  
+
+aws cloudformation deploy --template-file s3://${PROJECT_NAME}-bucket-general-files/template.yml \
+--stack-name ${PROJECT_NAME}-stack --parameter-overrides s3://${PROJECT_NAME}-bucket-general-files/cfnparams
+
+
 
 aws cloudformation package --template-file template.yml \ 
 --s3-bucket s3://${PROJECT_NAME}-bucket-general-files
