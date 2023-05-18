@@ -34,10 +34,10 @@ aws s3 cp template.yml s3://${PROJECT_NAME}-bucket-general-files
 wait 
 
 #validate tempalte
-#aws cloudformation validate-template --template-body file://./template.yml
+# aws cloudformation validate-template --template-body file://./template.yml
 
 # deploy cfn  stack                   https://apidata1-bucket-general-files.s3.amazonaws.com/template.yml
 
-aws cloudformation deploy --template-file file://./template.yml \
+aws cloudformation deploy --template-file "file://template.yml" \
 --stack-name ${PROJECT_NAME}-stack --parameter-overrides file://./cfnparams.json
 
