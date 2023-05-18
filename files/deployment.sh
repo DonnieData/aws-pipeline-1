@@ -18,7 +18,7 @@ echo "{
     \"ParameterValue\": \"$PROJECT_NAME\"
 }" > ~/cfnparams.json
 
-aws s3 cp cfnparams.json s3://${PROJECT_NAME}-bucket-general-files
+#aws s3 cp cfnparams.json s3://${PROJECT_NAME}-bucket-general-files
 
 
 curl -o api-func-deployment-package.zip https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/lambda/api-func-deployment-package.zip;
@@ -27,16 +27,17 @@ aws s3 cp api-func-deployment-package.zip s3://${PROJECT_NAME}-bucket-general-fi
 curl -o glujob1.py https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/glue/glujob1.py;
 aws s3 cp glujob1.py s3://${PROJECT_NAME}-bucket-general-files
 
-curl -o template.yml https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/template.yml;
+curl -o template.yml https://raw.githubusercontent.com/DonnieData/aws-pipeline-1/main/files/cfn_template.yml;
 aws s3 cp template.yml s3://${PROJECT_NAME}-bucket-general-files
 
 }
 wait 
 
+#validate tempalte
+#aws cloudformation validate-template --template-body file://./template.yml
 
-# deploy cfn  stack  
+# deploy cfn  stack                   https://apidata1-bucket-general-files.s3.amazonaws.com/template.yml
 
-aws cloudformation deploy --template-file "s3://${PROJECT_NAME}-bucket-general-files/template.yml" \
---stack-name ${PROJECT_NAME}-stack --parameter-overrides "s3://${PROJECT_NAME}-bucket-general-files/cfnparams.json"
-
+aws cloudformation deploy --template-file file://./template.yml \
+--stack-name ${PROJECT_NAME}-stack --parameter-overrides file://./cfnparams.json
 
