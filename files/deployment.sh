@@ -13,10 +13,10 @@ wait
 #curl -o parameters.json 
 #aws s3 cp parameters.json s3://${PROJECT_NAME}-bucket-general-files
 
-echo "{
+echo "[{
     \"ParameterKey\": \"projectName\",
     \"ParameterValue\": \"$PROJECT_NAME\"
-}" > ~/cfnparams.json
+}]" > ~/cfnparams.json
 
 #aws s3 cp cfnparams.json s3://${PROJECT_NAME}-bucket-general-files
 
@@ -39,8 +39,8 @@ wait
 # deploy cfn  stack                   https://apidata1-bucket-general-files.s3.amazonaws.com/template.yml
 
 
-aws cloudformation package --template-file template.yml \
- --s3-bucket s3://${PROJECT_NAME}-bucket-general-files --output-template-file packaged.template
+#aws cloudformation package --template-file template.yml \
+# --s3-bucket s3://${PROJECT_NAME}-bucket-general-files --output-template-file packaged.template
 
 
 
