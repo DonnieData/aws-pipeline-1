@@ -38,6 +38,12 @@ wait
 
 # deploy cfn  stack                   https://apidata1-bucket-general-files.s3.amazonaws.com/template.yml
 
-aws cloudformation deploy --template-file "file://template.yml" \
---stack-name ${PROJECT_NAME}-stack --parameter-overrides file://./cfnparams.json
+
+aws cloudformation package --template-file file://~/template.yml \
+ --s3-bucket s3://${PROJECT_NAME}-bucket-general-files --output-template-file packaged.template
+
+
+
+aws cloudformation deploy --template-file file://~/template.yml \
+--stack-name ${PROJECT_NAME}-stack --parameter-overrides file://~/cfnparams.json
 
