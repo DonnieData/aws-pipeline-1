@@ -45,5 +45,5 @@ wait
 
 
 aws cloudformation deploy --template-file template.yml \
---stack-name ${PROJECT_NAME}-stack --parameter-overrides file://cfnparams.json
+--stack-name ${PROJECT_NAME}-stack --parameter-overrides file://cfnparams.json --capabilities CAPABILITY_IAM
 

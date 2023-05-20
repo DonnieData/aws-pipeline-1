@@ -1,4 +1,4 @@
-Transform: AWS::Serverless-2016-10-31
+Transform: 'AWS::Serverless-2016-10-31'
 Parameters:
   projectName:
     Type: String
@@ -53,15 +53,6 @@ Metadata:
         'y': 80
       z: 0
       embeds: []
-    d3f03a86-d8e9-405a-9a6b-727dd5320be3:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 460
-        'y': 170
-      z: 0
-      embeds: []
     6a4bbb58-9b27-4185-bcd1-4968fdfef6c8:
       size:
         width: 60
@@ -71,15 +62,13 @@ Metadata:
         'y': 170
       z: 0
       embeds: []
-      isassociatedwith:
-        - d3f03a86-d8e9-405a-9a6b-727dd5320be3
     d6a51393-6865-40de-99ef-fc7a99b39746:
       size:
         width: 60
         height: 60
       position:
-        x: 350.3143503829611
-        'y': 285.76549698326784
+        x: 350
+        'y': 290
       z: 0
       embeds: []
       isassociatedwith:
@@ -151,24 +140,19 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ff3892f4-66ba-42a9-8a2b-00ae68d7485f
-  gluemanagedpolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties: {}
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: d3f03a86-d8e9-405a-9a6b-727dd5320be3
   lambdamanagedpolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      Version: 2012-10-17
-      Statement:
-        - Sid: VisualEditor0
-          Effect: Allow
-          Action:
-            - 'events:PutEvents'
-            - 'lambda:ListFunctions'
-            - 'lambda:InvokeFunction'
-          Resource: '*'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: VisualEditor0
+            Effect: Allow
+            Action:
+              - 'events:PutEvents'
+              - 'lambda:ListFunctions'
+              - 'lambda:InvokeFunction'
+            Resource: '*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: f861f418-7451-4c61-85e3-3f4ff84d66cb
@@ -183,7 +167,7 @@ Resources:
               Service: glue.amazonaws.com
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
-        - !Ref gluemanagedpolicy
+        - 'arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 6a4bbb58-9b27-4185-bcd1-4968fdfef6c8
@@ -241,42 +225,45 @@ Resources:
   statemachineLambdaPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      Version: 2012-10-17
-      Statement:
-        Effect: Allow
-        Action:
-          - 'lambda:InvokeFunction'
-        Resource: '*'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 'lambda:InvokeFunction'
+          Resource: '*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ffe425c5-e80e-4ae4-b9d6-eb43f70305d9
   statemachineGluePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      Version: 2012-10-17
-      Statement:
-        Effect: Allow
-        Action:
-          - 'glue:StartJobRun'
-          - 'glue:GetJobRun'
-          - 'glue:GetJobRuns'
-          - 'glue:BatchStopJobRun'
-        Resource: '*'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 'glue:StartJobRun'
+            - 'glue:GetJobRun'
+            - 'glue:GetJobRuns'
+            - 'glue:BatchStopJobRun'
+          Resource: '*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 679a9e7c-69f0-464e-8c4e-1493e6083324
   statemachineXRayAccess:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      Version: 2012-10-17
-      Statement:
-        Effect: Allow
-        Action:
-          - 'xray:PutTraceSegments'
-          - 'xray:PutTelemetryRecords'
-          - 'xray:GetSamplingRules'
-          - 'xray:GetSamplingTargets'
-        Resource: '*'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 'xray:PutTraceSegments'
+            - 'xray:PutTelemetryRecords'
+            - 'xray:GetSamplingRules'
+            - 'xray:GetSamplingTargets'
+          Resource: '*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 466232da-36cd-4088-953a-a7f46b8a47cb
