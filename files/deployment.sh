@@ -1,6 +1,6 @@
 #create buckets, vars  
 {
-PROJECT_NAME=apidata
+PROJECT_NAME=apidata1
 ACCNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 aws s3 mb s3://${PROJECT_NAME}-bucket-general-files
 }
