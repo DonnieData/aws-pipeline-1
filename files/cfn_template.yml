@@ -121,7 +121,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 190
+        x: 200
         'y': 180
       z: 0
       embeds: []
@@ -293,7 +293,9 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri: !Sub 's3//${projectName}-bucket-general-files/api-func-deployment-package.zip'
+      Code:
+        S3Bucket: !Sub 's3//${projectName}-bucket-general-files'
+        S3Key: api-func-deployment-package.zip
       Description: ''
       MemorySize: 128
       Timeout: 300
