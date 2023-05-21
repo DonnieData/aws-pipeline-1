@@ -288,6 +288,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 99168c3d-6818-4f56-b29f-162380b8e99a
+    DeletionPolicy: Retain
   apidatalambdagetdata:
     Type: 'AWS::Lambda::Function'
     Properties:
