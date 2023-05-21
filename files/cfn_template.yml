@@ -300,7 +300,7 @@ Resources:
       Description: ''
       MemorySize: 128
       Timeout: 300
-      Role: !Ref lambdarole
+      Role: !GetAtt lambdarole.Arn
       Environment:
         Variables:
           raw_data_bucket: !Ref ApidataBucketRawjson
